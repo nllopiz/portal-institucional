@@ -1,18 +1,18 @@
 [
   {
+    "category": "general",
     "id": "c1",
     "name": "Reportes de incidentes y eventos de seguridad del paciente",
     "description": "Formulario para el reporte de incidentes y eventos.",
     "url": "https://docs.google.com/forms/d/e/1FAIpQLSek8Rg6cS72eYrrL558ELRjtJLlx41FwUadq029FLL6VEd1gA/viewform?usp=header",
-    "icon": "Database",
-    "category": "general"
+    "icon": "FileText"
   },
   {
+    "category": "general",
     "id": "c2",
     "name": "Políticas y Procedimientos de Calidad y Seguridad",
     "description": "Acceso a las Políticas de Calidad y Seguridad y correspondientes manuales de procedimientos.",
     "url": "https://drive.google.com/drive/folders/1glQpnLV8cdLyiC3GjdYZ7VflpYoalcHb?usp=sharing",
-    "icon": "Database",
-    "category": "general"
+    "icon": "LayoutGrid"
   }
 ]

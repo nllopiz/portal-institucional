@@ -35,7 +35,7 @@ export default function HomePage({ config }) {
               <div className="w-20 h-20 bg-hospital-light text-hospital-primary rounded-3xl flex items-center justify-center mb-8 shadow-inner">
                 <Grid size={40} />
               </div>
-              <h2 className="text-3xl font-black text-hospital-dark mb-4 group-hover:text-hospital-primary transition-colors">Servicios Digitales</h2>
+              <h2 className="text-3xl font-black text-hospital-dark mb-4 group-hover:text-hospital-primary transition-colors">Servicios<br/>Digitales</h2>
               <p className="text-slate-500 mb-8 max-w-xs leading-relaxed">
                 Acceso directo a aplicaciones, sistemas y herramientas de uso cotidiano en el hospital.
               </p>
@@ -56,7 +56,7 @@ export default function HomePage({ config }) {
               <div className="w-20 h-20 bg-hospital-light text-hospital-primary rounded-3xl flex items-center justify-center mb-8 shadow-inner">
                 <FileText size={40} />
               </div>
-              <h2 className="text-3xl font-black text-hospital-dark mb-4 group-hover:text-hospital-primary transition-colors">Trámites e Información</h2>
+              <h2 className="text-3xl font-black text-hospital-dark mb-4 group-hover:text-hospital-primary transition-colors">Trámites<br/> e Información</h2>
               <p className="text-slate-500 mb-8 max-w-xs leading-relaxed">
                 Información interna, requisitos, formularios y guías paso a paso para el personal.
               </p>
@@ -77,9 +77,9 @@ export default function HomePage({ config }) {
               <div className="w-20 h-20 bg-hospital-light text-hospital-primary rounded-3xl flex items-center justify-center mb-8 shadow-inner">
                 <ShieldCheck size={40} />
               </div>
-              <h2 className="text-3xl font-black text-hospital-dark mb-4 group-hover:text-hospital-primary transition-colors">Calidad y Seguridad del Paciente</h2>
+              <h2 className="text-3xl font-black text-hospital-dark mb-4 group-hover:text-hospital-primary transition-colors">Calidad y Seguridad <br/>del Paciente</h2>
               <p className="text-slate-500 mb-8 max-w-xs leading-relaxed">
-                Políticas, reportes de incidentes y documentación para la seguridad del paciente.
+                Rporte de incidentes de seguridad, estandarización de procesos y monitoreo de indicadores.
               </p>
               <div className="flex items-center gap-2 text-hospital-primary font-bold uppercase text-xs tracking-widest">
                 Ver recursos <ChevronRight size={16} />

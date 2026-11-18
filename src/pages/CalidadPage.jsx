@@ -69,7 +69,7 @@ export default function CalidadPage() {
               <ArrowLeft size={16} /> Volver al Inicio
             </Link>
             <h1 className="text-4xl font-black text-hospital-dark tracking-tighter">Calidad y Seguridad<span className="text-hospital-primary"> del Paciente</span></h1>
-            <p className="text-slate-500 mt-2 font-light">Haga clic en una tarjeta para abrir la aplicación correspondiente en una nueva pestaña.</p>
+            <p className="text-slate-500 mt-2 font-light">Gestión de Riesgo, reporte de incidentes de seguridad, estandarización de procesos y monitoreo de indicadores para garantizar una atención segura y de calidad.</p>
           </div>
 
           {/* Controls: Search */}
