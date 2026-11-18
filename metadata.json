@@ -1,0 +1,8 @@
+{
+  "name": "Hospital Paroisien - Portal de Trámites",
+  "description": "Portal informativo de trámites internos para el personal asistencial y administrativo del Hospital Dr. Diego Paroisien.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

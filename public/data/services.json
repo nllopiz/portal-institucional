@@ -1,0 +1,162 @@
+[
+  {
+    "id": "s1",
+    "name": "HSI - Historia de Salud Integrada",
+    "description": "Acceso al sistema central de historias clínicas y turnos.",
+    "url": "https://hsi.mendoza.gov.ar",
+    "icon": "Database",
+    "category": "asistencial"
+  },
+  {
+    "category": "general",
+    "id": "s2",
+    "name": "GDE - Gestión Documental Electrónica",
+    "description": "Sistema de Expediente Electrónico y Comunicaciones Oficiales.",
+    "url": "https://gde.mendoza.gov.ar",
+    "icon": "FileText"
+  },
+  {
+    "category": "general",
+    "id": "s3",
+    "name": "Correo de Gobierno",
+    "description": "Acceso web al correo de gobierno @mendoza.gov.ar",
+    "url": "https://rcmail.mendoza.gov.ar",
+    "icon": "Mail"
+  },
+  {
+    "id": "s1780490868018",
+    "name": "Mendoza x Mí",
+    "description": "Tus bonos de sueldo, recetas y más.",
+    "url": "https://mxm.mendoza.gov.ar/",
+    "icon": "LayoutGrid",
+    "category": "general"
+  },
+  {
+    "id": "s1780588417509",
+    "name": "Laboratorio",
+    "description": "Consulta de resultados del Laboratorio.",
+    "url": "https://htalparoissien.optimihub.com.ar:8445",
+    "icon": "LayoutGrid",
+    "category": "asistencial"
+  },
+  {
+    "id": "s1780589090483",
+    "name": "Diagnóstico por Imágenes",
+    "description": "Consulta resultados de Imágenes",
+    "url": "https://paroissien.cli.biobox.com.ar",
+    "icon": "LayoutGrid",
+    "category": "asistencial"
+  },
+  {
+    "category": "administrativo",
+    "id": "s1780590201160",
+    "name": "Anses - CODEM",
+    "description": "Consulta de Obras Sociales",
+    "url": "https://www.anses.gob.ar/consultas/obra-social",
+    "icon": "LayoutGrid"
+  },
+  {
+    "id": "s1780590385214",
+    "name": "Superintendencia de Servicios de Salud",
+    "description": "Consulta Obras Sociales",
+    "url": "https://seguro.sssalud.gob.ar/indexss.php?opc=bus650&user=HPGD&cat=consultas",
+    "icon": "LayoutGrid",
+    "category": "administrativo"
+  },
+  {
+    "id": "s1780590472311",
+    "name": "PAMI",
+    "description": "Consulta de PAMI",
+    "url": "http://institucional.pami.org.ar",
+    "icon": "LayoutGrid",
+    "category": "administrativo"
+  },
+  {
+    "id": "s1780590516245",
+    "name": "OSEP",
+    "description": "",
+    "url": "https://www.osep.mendoza.gov.ar/webapp_pri/action/index",
+    "icon": "LayoutGrid",
+    "category": "general"
+  },
+  {
+    "category": "administrativo",
+    "id": "s1780590604858",
+    "name": "SIDICO",
+    "description": "Ingreso a SIDICO",
+    "url": "https://sidico-web.mendoza.gov.ar/Sidico/servlet/hdefault",
+    "icon": "LayoutGrid"
+  },
+  {
+    "category": "general",
+    "id": "s1780590723106",
+    "name": "SIDICO - Bienes de Consumo",
+    "description": "Ingreso a Bienes de Consumo de SIDICO",
+    "url": "https://bienes.mendoza.gov.ar/Bienes/servlet/hbie0001",
+    "icon": "LayoutGrid"
+  },
+  {
+    "id": "s1780590806838",
+    "name": "TICKETS Mendoza",
+    "description": "Ingreso a Tickets Mendoza",
+    "url": "https://tickets.mendoza.gov.ar/ticketsprd/servlet/login",
+    "icon": "LayoutGrid",
+    "category": "administrativo"
+  },
+  {
+    "id": "s1780591217985",
+    "name": "TICKETS Mendoza - ADMISIÓN",
+    "description": "Ingresar al Sistema de Tickets para Responder Tickets de turnos",
+    "url": "https://ticketsform.mendoza.gov.ar/ticketsform/servlet/responderformulario?UGP_HPAROISSIEN",
+    "icon": "LayoutGrid",
+    "category": "administrativo"
+  },
+  {
+    "id": "s1780591401898",
+    "name": "SGA - Sistema de Gestión Asistencial",
+    "description": "Consulta de marcaciones de entrada y salida. Creación de Diagramas de horarios del personal.",
+    "url": "https://sgasalud.mendoza.gov.ar/SitioSalud/",
+    "icon": "Database",
+    "category": "general"
+  },
+  {
+    "id": "s1780591957400",
+    "name": "ANSES - Certificación negativa",
+    "description": "Consulta de Certificación Negativa de ANSES",
+    "url": "https://servicioswww.anses.gob.ar/censite/index.aspx",
+    "icon": "LayoutGrid",
+    "category": "administrativo"
+  },
+  {
+    "category": "administrativo",
+    "id": "s1780592646380",
+    "name": "QR Turnos",
+    "description": "Documento para mostrar QR de Turnos a los pacientes",
+    "url": "https://drive.google.com/file/d/1Ru-GYoJbKIH5uD_qlCzNM2daqRoo1U4P/view?usp=drive_link",
+    "icon": "Database"
+  },
+  {
+    "id": "s1780687893959",
+    "name": "Teléfonos Internos",
+    "description": "Guía de Teléfonos Internos del Hospital",
+    "url": "https://docs.google.com/spreadsheets/d/1Am4fiq8eo9V5AYsoKRdlbrOKSZFCq_pUv19LXiHzUms/edit?usp=sharing",
+    "icon": "BookOpen",
+    "category": "general"
+  },
+  {
+    "id": "s1780687893960",
+    "name": "Datos del Hospital para ANSES",
+    "description": "Datos del Hospital para trámites de pacientes en ANSES",
+    "url": "https://drive.google.com/file/d/1Mf8HVE5OalqBOhIBkzR2khCU1w4sx5eI/view?usp=drive_link",
+    "icon": "BookOpen",
+    "category": "general"
+  },
+  {
+    "id": "s1785242965551",
+    "name": "REFORSAL",
+    "description": "Ingreso a la aplicación de REFORSAL",
+    "url": "https://spi.scmp.com.ar/min_salud/index.php",
+    "icon": "Database",
+    "category": "administrativo"
+  }
+]

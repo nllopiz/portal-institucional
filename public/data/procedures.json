@@ -1,0 +1,119 @@
+[
+  {
+    "id": "t1780342709088",
+    "title": "Correo de Gobierno - Clave nueva / Cuenta nueva",
+    "category": "general",
+    "description": "Aquí podés realizar la solicitud de una Cuenta Nueva o una Clave Nueva de Correo de Gobierno.",
+    "requirements": ["Ser empleado de planta o contratado"],
+    "steps": [
+      "Completa el Formulario del Link",
+      "Recibirás un mail en tu correo personal con los datos solicitados (en el mismo día o al día siguiente)"
+    ],
+    "documentation": [],
+    "hours": "Lunes a Viernes de 07:30 a 15:00",
+    "location": "",
+    "contact": "",
+    "pdfUrl": "",
+    "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSefkY4JhNuGiesdTCw_iI1dpih8gkbt0yyWi-kNzzt2uNVsJw/viewform?usp=preview"
+  },
+  {
+    "id": "t1780424440770",
+    "title": "Usuario de SIDICO",
+    "category": "administrativo",
+    "description": "Solicitud de Alta de usuario de SIDICO",
+    "requirements": [
+      "Tener cuenta de Correo de Gobierno y poder acceder a la misma",
+      "Tener usuario de GDE"
+    ],
+    "steps": [
+      "Descargar el Formulario",
+      "Completar TODOS los datos solicitados",
+      "Hacer clic en el botón GUARDAR",
+      "Colocar como nombre de archivo SERVICIO-APELLIDO (ej: FARMACIA-GOMEZ)",
+      "Seleccionar la carpeta donde se guardará el archivo PDF con sus datos cargados, puede ser Documentos",
+      "Enviar el archivo PDF guardado en una Comunicación Oficial mediante Sistema GDE",
+      "En CCOO, iniciar documento y seleccionar el tipo de documento NIC",
+      "Importar el PDF guardado",
+      "Destinatario: nllopiz (Norberto Llopiz)"
+    ],
+    "documentation": [],
+    "hours": "Lunes a Viernes de 07:30 a 15:00",
+    "location": "",
+    "contact": "",
+    "pdfUrl": "https://drive.google.com/file/d/1KqM7XIbAW9sqpwAnAbpMBk5gPIRZx5xH/view?usp=drive_link",
+    "formUrl": ""
+  },
+  {
+    "id": "t1780427805210",
+    "title": "Usuario de SIDICO - Bienes de Consumo",
+    "category": "administrativo",
+    "description": "Solicitud de alta en el módulo Bienes de Consumo de SIDICO.",
+    "requirements": [],
+    "steps": [
+      "Descargar el Formulario",
+      "Completar los datos del Depósito correspondiente y de los usuarios que se solicita acceso",
+      "Hacer clic en el botón GUARDAR. Seleccionar la carpeta donde se guardará el archivo PDF con sus datos cargados, puede ser Documentos. Colocar como nombre del archivo SERVICIO-APELLIDO (ej: FARMACIA-GOMEZ)",
+      "Enviar el archivo PDF por mail a informatica-paroissien@mendoza.gov.ar"
+    ],
+    "documentation": [],
+    "hours": "Lunes a Viernes de 07:30 a 15:00",
+    "location": "",
+    "contact": "",
+    "pdfUrl": "https://drive.google.com/file/d/1t1iMOdsGAWq_WVSwJ8dey30ZUmlt82RJ/view?usp=drive_link",
+    "formUrl": ""
+  },
+  {
+    "id": "t1780428829917",
+    "title": "Usuario de GDE - Expediente electrónico",
+    "category": "general",
+    "description": "Solicitud de Usuario de GDE para la tramitación de expedientes electrónicos.",
+    "requirements": [
+      "Tener cuenta de Correo de Gobierno y poder acceder a la misma"
+    ],
+    "steps": [
+      "La solicitud debe ser realizada por el Jefe del Servicio",
+      "Enviar un correo a informatica-paroissien@mendoza.gov.ar con el mensaje: \"Solicito el alta de Usuario de GDE para el agente Nombre y Apellido, DNI nro.\"\""
+    ],
+    "documentation": [],
+    "hours": "Lunes a Viernes de 07:30 a 15:00",
+    "location": "",
+    "contact": "",
+    "pdfUrl": "",
+    "formUrl": ""
+  },
+  {
+    "id"
+    : "t1780428829918",
+    "title": "HSI - Autenticación de Doble Factor",
+    "category": "asistencial",
+    "description": "Activación de la Autenticación de Doble Factor.",
+    "requirements": ["Tener usuario de HSI"],
+    "steps": [
+      "Descargar el PDF con el Instructivo",
+      "Seguir todos los pasos del instructivo"
+    ],
+    "documentation": [],
+    "hours": "Lunes a Viernes de 07:30 a 15:00",
+    "location": "",
+    "contact": "",
+    "pdfUrl": "https://drive.google.com/file/d/1ASCYHJp-8iB_nO6IWcXWAD7oN76jThiQ/view?usp=drive_link",
+    "formUrl": ""
+  },
+  {
+    "id": "t1780428829919",
+    "title": "MxM - Cómo subir de nivel",
+    "category": "general",
+    "description": "Cómo subir de nivel en MxM.",
+    "requirements": ["Estar registrado en MxM"],
+    "steps": [
+      "Descargar el PDF con el Instructivo",
+      "Seguir todos los pasos del instructivo"
+    ],
+    "documentation": [],
+    "hours": "Lunes a Viernes de 08:00 a 13:00",
+    "location": "Recursos Humanos",
+    "contact": "",
+    "pdfUrl": "https://drive.google.com/file/d/1iLnhJz9Tu0RLIlx-EMinXhMZP-2S8_QU/view?usp=drive_link",
+    "formUrl": ""
+  }
+]
