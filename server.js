@@ -3,6 +3,8 @@ import path from "path";
 import fs from "fs/promises";
 import { createServer as createViteServer } from "vite";
 
+const DATA_FILES = new Set(["procedures", "faq", "siteConfig", "services", "calidad"]);
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -14,7 +16,7 @@ async function startServer() {
     try {
       const fileName = req.params.file;
       // Safety check to prevent directory traversal
-      if (!["procedures", "faq", "siteConfig", "services"].includes(fileName)) {
+      if (!DATA_FILES.has(fileName)) {
         return res.status(400).json({ error: "Invalid file name" });
       }
       const filePath = path.join(process.cwd(), "public", "data", `${fileName}.json`);
@@ -28,7 +30,7 @@ async function startServer() {
   app.post("/api/data/:file", async (req, res) => {
     try {
       const fileName = req.params.file;
-      if (!["procedures", "faq", "siteConfig", "services"].includes(fileName)) {
+      if (!DATA_FILES.has(fileName)) {
         return res.status(400).json({ error: "Invalid file name" });
       }
       const filePath = path.join(process.cwd(), "public", "data", `${fileName}.json`);

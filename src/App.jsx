@@ -33,6 +33,7 @@ const Header = ({ config }) => {
     <>
       <Link to="/" onClick={() => setIsMenuOpen(false)} className={`hover:text-hospital-primary transition-colors ${location.pathname === '/' ? 'text-hospital-primary' : ''} ${className}`}>Inicio</Link>
       <Link to="/servicios" onClick={() => setIsMenuOpen(false)} className={`hover:text-hospital-primary transition-colors ${location.pathname === '/servicios' ? 'text-hospital-primary' : ''} ${className}`}>Servicios</Link>
+      <Link to="/calidad" onClick={() => setIsMenuOpen(false)} className={`hover:text-hospital-primary transition-colors ${location.pathname === '/calidad' ? 'text-hospital-primary' : ''} ${className}`}>Calidad</Link>
       <Link to="/tramites" onClick={() => setIsMenuOpen(false)} className={`hover:text-hospital-primary transition-colors ${location.pathname === '/tramites' ? 'text-hospital-primary' : ''} ${className}`}>Trámites</Link>
       <Link to="/faq" onClick={() => setIsMenuOpen(false)} className={`hover:text-hospital-primary transition-colors ${location.pathname === '/faq' ? 'text-hospital-primary' : ''} ${className}`}>FAQ</Link>
       <a href="#contacto" onClick={() => setIsMenuOpen(false)} className={`hover:text-hospital-primary transition-colors ${className}`}>Contacto</a>

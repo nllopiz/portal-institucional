@@ -11,6 +11,7 @@ import {
   HelpCircle, 
   Settings, 
   Briefcase, 
+  ShieldCheck,
   LayoutGrid, 
   Search, 
   Clock, 
@@ -28,6 +29,39 @@ import { fetchData, saveData } from "../lib/api";
 
 const ICON_OPTIONS = ["Database", "User", "Mail", "BookOpen", "FileText", "LayoutGrid", "Settings"];
 
+const LINK_SOURCES = {
+  services: {
+    heading: "Gestión de Servicios y Aplicaciones",
+    subheading: "Agregue o configure accesos directos a plataformas y sistemas externos.",
+    searchPlaceholder: "Buscar servicio...",
+    newButton: "Nuevo Servicio",
+    editTitle: "Editar Servicio",
+    newTitle: "Nuevo Servicio Institucional",
+    editorSubtitle: "Defina las credenciales de navegación de la tarjeta de servicio.",
+    nameLabel: "Nombre del Servicio / App",
+    namePlaceholder: "Ej. Portal de Recetas Digitales",
+    descriptionPlaceholder: "Breve descripción del propósito y uso del servicio...",
+    saveButton: "Guardar Servicio",
+    defaultCategory: "asistencial",
+    entityLabel: "el servicio"
+  },
+  calidad: {
+    heading: "Gestión de Calidad y Seguridad del Paciente",
+    subheading: "Administre formularios, políticas y documentación de calidad y seguridad.",
+    searchPlaceholder: "Buscar recurso...",
+    newButton: "Nuevo Recurso",
+    editTitle: "Editar Recurso",
+    newTitle: "Nuevo Recurso de Calidad",
+    editorSubtitle: "Defina la información y el enlace del recurso de calidad.",
+    nameLabel: "Nombre del Recurso",
+    namePlaceholder: "Ej. Reporte de incidentes y eventos",
+    descriptionPlaceholder: "Breve descripción del recurso y su uso...",
+    saveButton: "Guardar Recurso",
+    defaultCategory: "general",
+    entityLabel: "el recurso de calidad"
+  }
+};
+
 export default function AdminPage({ 
   procedures, 
   setProcedures, 
@@ -40,19 +74,19 @@ export default function AdminPage({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState("tramites"); // 'tramites' | 'servicios' | 'faq' | 'config'
+  const [activeTab, setActiveTab] = useState("tramites"); // 'tramites' | 'servicios' | 'calidad' | 'faq' | 'config'
   const [error, setError] = useState("");
 
-  // Services Local State
-  const [services, setServices] = useState([]);
-  const [loadingServices, setLoadingServices] = useState(false);
+  // Links Local State (Servicios y Calidad)
+  const [links, setLinks] = useState({ services: [], calidad: [] });
+  const [loadingLinks, setLoadingLinks] = useState(true);
 
   // Editing States
   const [editingProcedure, setEditingProcedure] = useState(null);
-  const [editingService, setEditingService] = useState(null);
+  const [editingLink, setEditingLink] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [procedureSearch, setProcedureSearch] = useState("");
-  const [serviceSearch, setServiceSearch] = useState("");
+  const [linkSearch, setLinkSearch] = useState({ services: "", calidad: "" });
 
   // Helper Inputs for lists
   const [newRequirement, setNewRequirement] = useState("");
@@ -66,19 +100,32 @@ export default function AdminPage({
       setIsLoggedIn(true);
     }
     
-    // Load services
-    const loadServices = async () => {
-      setLoadingServices(true);
-      try {
-        const s = await fetchData("services");
-        setServices(s);
-      } catch (err) {
-        console.error("Error cargando servicios", err);
-      } finally {
-        setLoadingServices(false);
+    // Load services and calidad resources
+    const loadLinks = async () => {
+      setLoadingLinks(true);
+      const [servicesResult, calidadResult] = await Promise.allSettled([
+        fetchData("services"),
+        fetchData("calidad"),
+      ]);
+
+      const nextLinks = { services: [], calidad: [] };
+
+      if (servicesResult.status === "fulfilled") {
+        nextLinks.services = Array.isArray(servicesResult.value) ? servicesResult.value : [];
+      } else {
+        console.error("Error cargando servicios", servicesResult.reason);
       }
+
+      if (calidadResult.status === "fulfilled") {
+        nextLinks.calidad = Array.isArray(calidadResult.value) ? calidadResult.value : [];
+      } else {
+        console.error("Error cargando recursos de calidad", calidadResult.reason);
+      }
+
+      setLinks(nextLinks);
+      setLoadingLinks(false);
     };
-    loadServices();
+    loadLinks();
   }, []);
 
   const handleLogin = () => {
@@ -155,48 +202,65 @@ export default function AdminPage({
     }
   };
 
-  // --- Services (Servicios) Handlers ---
-  const handleEditService = (s) => {
-    setEditingService({ 
-      category: "asistencial",
-      ...s 
+  // --- Links (Servicios y Calidad) Handlers ---
+  const handleEditLink = (source, item) => {
+    setEditingLink({
+      source,
+      item: {
+        category: LINK_SOURCES[source].defaultCategory,
+        ...item
+      }
     });
   };
 
-  const handleNewService = () => {
-    setEditingService({
-      id: "",
-      name: "",
-      description: "",
-      url: "",
-      icon: "Database",
-      category: "asistencial"
+  const handleNewLink = (source) => {
+    setEditingLink({
+      source,
+      item: {
+        id: "",
+        name: "",
+        description: "",
+        url: "",
+        icon: "Database",
+        category: LINK_SOURCES[source].defaultCategory
+      }
     });
   };
 
-  const handleSaveService = async () => {
-    if (!editingService.name.trim()) {
+  const updateEditingLink = (changes) => {
+    setEditingLink(prev => prev ? { ...prev, item: { ...prev.item, ...changes } } : prev);
+  };
+
+  const handleSaveLink = async () => {
+    if (!editingLink) return;
+    const { source, item } = editingLink;
+    if (!(item.name || "").trim()) {
       alert("Por favor ingrese un nombre");
       return;
     }
+    const current = links[source];
     let updated;
-    if (editingService.id) {
-      updated = services.map(s => s.id === editingService.id ? editingService : s);
+    if (item.id) {
+      updated = current.map(link => link.id === item.id ? item : link);
     } else {
-      const newId = `s${Date.now()}`;
-      updated = [...services, { ...editingService, id: newId }];
+      const prefix = source === "calidad" ? "c" : "s";
+      updated = [...current, { ...item, id: `${prefix}${Date.now()}` }];
     }
-    await handleSaveData("services", updated, setServices);
-    setEditingService(null);
+    await handleSaveData(source, updated, (data) => {
+      setLinks(prev => ({ ...prev, [source]: data }));
+    });
+    setEditingLink(null);
   };
 
-  const handleDeleteService = (id) => {
-    const srv = services.find(s => s.id === id);
-    if (srv) {
+  const handleDeleteLink = (source, id) => {
+    const link = links[source].find(item => item.id === id);
+    if (link) {
       setDeleteConfirm({
-        type: "service",
+        type: "link",
+        source,
         id,
-        title: srv.name
+        title: link.name,
+        entityLabel: LINK_SOURCES[source].entityLabel
       });
     }
   };
@@ -220,14 +284,16 @@ export default function AdminPage({
 
   const executeDeleteConfirm = async () => {
     if (!deleteConfirm) return;
-    const { type, id } = deleteConfirm;
+    const { type, id, source } = deleteConfirm;
     
     if (type === "procedure") {
       const updated = procedures.filter(p => p.id !== id);
       await handleSaveData("procedures", updated, setProcedures);
-    } else if (type === "service") {
-      const updated = services.filter(s => s.id !== id);
-      await handleSaveData("services", updated, setServices);
+    } else if (type === "link") {
+      const updated = links[source].filter(item => item.id !== id);
+      await handleSaveData(source, updated, (data) => {
+        setLinks(prev => ({ ...prev, [source]: data }));
+      });
     } else if (type === "faq") {
       const updated = faqs.filter((_, idx) => idx !== id);
       await handleSaveData("faq", updated, setFaqs);
@@ -243,6 +309,203 @@ export default function AdminPage({
   // --- Config Handlers ---
   const handleSaveConfig = async () => {
     await handleSaveData("siteConfig", config, setConfig);
+  };
+
+  // --- Shared link manager (Servicios / Calidad) ---
+  const renderLinkManager = (source) => {
+    const config = LINK_SOURCES[source];
+    const items = links[source];
+    const search = linkSearch[source];
+    const editing = editingLink?.source === source ? editingLink.item : null;
+    const searchTerm = search.trim().toLowerCase();
+
+    const filteredItems = items.filter(item =>
+      (item.name || "").toLowerCase().includes(searchTerm) ||
+      (item.description || "").toLowerCase().includes(searchTerm)
+    );
+
+    if (!editing) {
+      return (
+        <div>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div>
+              <h2 className="text-2xl font-black text-hospital-dark tracking-tight">{config.heading}</h2>
+              <p className="text-slate-400 text-sm font-light">{config.subheading}</p>
+            </div>
+            <div className="flex flex-wrap gap-4 w-full sm:w-auto">
+              <div className="relative flex-grow sm:flex-grow-0">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <input 
+                  type="text" 
+                  placeholder={config.searchPlaceholder}
+                  aria-label={config.searchPlaceholder}
+                  value={search}
+                  onChange={(e) => setLinkSearch(prev => ({ ...prev, [source]: e.target.value }))}
+                  className="w-full sm:w-64 pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary"
+                />
+              </div>
+              <button 
+                onClick={() => handleNewLink(source)}
+                className="px-5 py-3 bg-hospital-primary hover:bg-hospital-dark text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md shadow-hospital-primary/15"
+              >
+                <Plus size={16} /> {config.newButton}
+              </button>
+            </div>
+          </div>
+
+          {loadingLinks ? (
+            <p className="text-center text-slate-400 py-8 font-light italic">Cargando lista...</p>
+          ) : filteredItems.length === 0 ? (
+            <p className="text-center text-slate-400 py-8 font-light italic">No se encontraron resultados.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredItems.map(item => (
+                <div 
+                  key={item.id} 
+                  className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60 flex items-center justify-between hover:border-hospital-primary/50 hover:bg-white hover:shadow-md transition-all group"
+                >
+                  <div className="flex items-center gap-4 overflow-hidden">
+                    <div className="w-12 h-12 rounded-xl shrink-0 bg-hospital-light text-hospital-primary flex items-center justify-center font-bold font-mono text-sm uppercase">
+                      {(item.icon || "Link").substring(0, 3)}
+                    </div>
+                    <div className="overflow-hidden">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-slate-800 truncate">{item.name}</h3>
+                        <span className={`px-2 py-0.5 text-[9px] font-black rounded-md uppercase tracking-wider ${
+                          item.category === "general" 
+                            ? "bg-indigo-50 text-indigo-600 border border-indigo-200/50" 
+                            : item.category === "administrativo" 
+                              ? "bg-blue-50 text-blue-600 border border-blue-200/50" 
+                              : "bg-emerald-50 text-emerald-600 border border-emerald-200/50"
+                        }`}>
+                          {item.category === "general" ? "General" : item.category === "administrativo" ? "Admin" : "Asist"}
+                        </span>
+                      </div>
+                      <p className="text-slate-400 text-xs truncate max-w-md font-light italic">{item.url}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-1.5 shrink-0 ml-4">
+                    <button 
+                      onClick={() => handleEditLink(source, item)}
+                      title="Editar"
+                      className="p-2.5 hover:bg-hospital-light text-slate-500 hover:text-hospital-primary rounded-xl transition-colors"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteLink(source, item.id)}
+                      title="Eliminar"
+                      className="p-2.5 hover:bg-red-50 text-slate-300 hover:text-red-600 rounded-xl transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div>
+            <h3 className="text-xl font-black text-hospital-dark italic">
+              {editing.id ? config.editTitle : config.newTitle}
+            </h3>
+            <p className="text-slate-400 text-xs font-light mt-0.5">{config.editorSubtitle}</p>
+          </div>
+          <button 
+            onClick={() => setEditingLink(null)}
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold uppercase transition-all"
+          >
+            Volver a la Lista
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">{config.nameLabel}</label>
+            <input 
+              type="text" 
+              value={editing.name || ""}
+              onChange={e => updateEditingLink({ name: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary"
+              placeholder={config.namePlaceholder}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Icono Lucide</label>
+            <select 
+              value={editing.icon || "Database"}
+              onChange={e => updateEditingLink({ icon: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary bg-white font-medium"
+            >
+              {ICON_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">URL de Destino (Enlace Externo)</label>
+            <input 
+              type="url" 
+              value={editing.url || ""}
+              onChange={e => updateEditingLink({ url: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary"
+              placeholder="https://su-subdominio.hospitalparoisien.gob.ar"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Categoría</label>
+            <select 
+              value={editing.category || config.defaultCategory}
+              onChange={e => updateEditingLink({ category: e.target.value })}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary bg-white font-medium"
+            >
+              <option value="asistencial">Asistencial</option>
+              <option value="administrativo">Administrativo</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Descripción Detallada</label>
+            <textarea 
+              value={editing.description || ""}
+              onChange={e => updateEditingLink({ description: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary h-24 text-sm resize-none"
+              placeholder={config.descriptionPlaceholder}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+          <button 
+            onClick={() => setEditingLink(null)}
+            className="px-5 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button 
+            onClick={handleSaveLink}
+            className="px-8 py-3 bg-hospital-primary hover:bg-hospital-dark text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-hospital-primary/10"
+          >
+            {config.saveButton}
+          </button>
+        </div>
+      </div>
+    );
   };
 
   if (!isLoggedIn) {
@@ -334,27 +597,33 @@ export default function AdminPage({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex bg-slate-200/50 p-1.5 rounded-2xl mb-10 max-w-2xl overflow-x-auto no-scrollbar shrink-0 gap-1 shadow-sm">
+        <div className="flex bg-slate-200/50 p-1.5 rounded-2xl mb-10 max-w-4xl overflow-x-auto no-scrollbar shrink-0 gap-1 shadow-sm">
           <button 
-            onClick={() => { setActiveTab("tramites"); setEditingProcedure(null); }}
+            onClick={() => { setActiveTab("tramites"); setEditingProcedure(null); setEditingLink(null); }}
             className={`flex items-center gap-2 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${activeTab === "tramites" ? "bg-white text-hospital-primary shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-white/30"}`}
           >
             <FileText size={16} /> Trámites ({procedures.length})
           </button>
           <button 
-            onClick={() => { setActiveTab("servicios"); setEditingService(null); }}
+            onClick={() => { setActiveTab("servicios"); setEditingLink(null); }}
             className={`flex items-center gap-2 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${activeTab === "servicios" ? "bg-white text-hospital-primary shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-white/30"}`}
           >
-            <LayoutGrid size={16} /> Servicios ({services.length})
+            <LayoutGrid size={16} /> Servicios ({links.services.length})
           </button>
           <button 
-            onClick={() => { setActiveTab("faq"); }}
+            onClick={() => { setActiveTab("calidad"); setEditingLink(null); }}
+            className={`flex items-center gap-2 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${activeTab === "calidad" ? "bg-white text-hospital-primary shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-white/30"}`}
+          >
+            <ShieldCheck size={16} /> Calidad ({links.calidad.length})
+          </button>
+          <button 
+            onClick={() => { setActiveTab("faq"); setEditingLink(null); }}
             className={`flex items-center gap-2 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${activeTab === "faq" ? "bg-white text-hospital-primary shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-white/30"}`}
           >
             <HelpCircle size={16} /> FAQs ({faqs.length})
           </button>
           <button 
-            onClick={() => { setActiveTab("config"); }}
+            onClick={() => { setActiveTab("config"); setEditingLink(null); }}
             className={`flex items-center gap-2 px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap ${activeTab === "config" ? "bg-white text-hospital-primary shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-white/30"}`}
           >
             <Settings size={16} /> Configuración
@@ -702,189 +971,10 @@ export default function AdminPage({
 
 
           {/* SERVICIOS TAB */}
-          {activeTab === "servicios" && (
-            <div>
-              {!editingService ? (
-                <div>
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                    <div>
-                      <h2 className="text-2xl font-black text-hospital-dark tracking-tight">Gestión de Servicios y Aplicaciones</h2>
-                      <p className="text-slate-400 text-sm font-light">Agregue o configure accesos directos a plataformas y sistemas externos.</p>
-                    </div>
-                    <div className="flex flex-wrap gap-4 w-full sm:w-auto">
-                      <div className="relative flex-grow sm:flex-grow-0">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                        <input 
-                          type="text" 
-                          placeholder="Buscar servicio..."
-                          value={serviceSearch}
-                          onChange={(e) => setServiceSearch(e.target.value)}
-                          className="w-full sm:w-64 pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary"
-                        />
-                      </div>
-                      <button 
-                        onClick={handleNewService}
-                        className="px-5 py-3 bg-hospital-primary hover:bg-hospital-dark text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md shadow-hospital-primary/15"
-                      >
-                        <Plus size={16} /> Nuevo Servicio
-                      </button>
-                    </div>
-                  </div>
+          {activeTab === "servicios" && renderLinkManager("services")}
 
-                  {loadingServices ? (
-                    <p className="text-center text-slate-400 py-8 font-light italic">Cargando lista de servicios...</p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {services
-                        .filter(s => s.name.toLowerCase().includes(serviceSearch.toLowerCase()) || s.description.toLowerCase().includes(serviceSearch.toLowerCase()))
-                        .map(s => (
-                          <div 
-                            key={s.id} 
-                            className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60 flex items-center justify-between hover:border-hospital-primary/50 hover:bg-white hover:shadow-md transition-all group"
-                          >
-                            <div className="flex items-center gap-4 overflow-hidden">
-                              <div className="w-12 h-12 rounded-xl shrink-0 bg-hospital-light text-hospital-primary flex items-center justify-center font-bold font-mono text-sm uppercase">
-                                {s.icon.substring(0, 3)}
-                              </div>
-                              <div className="overflow-hidden">
-                                <div className="flex items-center gap-2">
-                                  <h3 className="font-bold text-slate-800 truncate">{s.name}</h3>
-                                  <span className={`px-2 py-0.5 text-[9px] font-black rounded-md uppercase tracking-wider ${
-                                    s.category === "general" 
-                                      ? "bg-indigo-50 text-indigo-600 border border-indigo-200/50" 
-                                      : s.category === "administrativo" 
-                                        ? "bg-blue-50 text-blue-600 border border-blue-200/50" 
-                                        : "bg-emerald-50 text-emerald-600 border border-emerald-200/50"
-                                  }`}>
-                                    {s.category === "general" ? "General" : s.category === "administrativo" ? "Admin" : "Asist"}
-                                  </span>
-                                </div>
-                                <p className="text-slate-400 text-xs truncate max-w-md font-light italic">{s.url}</p>
-                              </div>
-                            </div>
-                            
-                            <div className="flex gap-1.5 shrink-0 ml-4">
-                              <button 
-                                onClick={() => handleEditService(s)}
-                                title="Editar Servicio"
-                                className="p-2.5 hover:bg-hospital-light text-slate-500 hover:text-hospital-primary rounded-xl transition-colors"
-                              >
-                                <Edit2 size={16} />
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteService(s.id)}
-                                title="Eliminar Servicio"
-                                className="p-2.5 hover:bg-red-50 text-slate-300 hover:text-red-600 rounded-xl transition-colors"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </div>
-                        ))
-                      }
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                    <div>
-                      <h3 className="text-xl font-black text-hospital-dark italic">
-                        {editingService.id ? "Editar Servicio" : "Nuevo Servicio Institucional"}
-                      </h3>
-                      <p className="text-slate-400 text-xs font-light mt-0.5">Defina las credenciales de navegación de la tarjeta de servicio.</p>
-                    </div>
-                    <button 
-                      onClick={() => setEditingService(null)}
-                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold uppercase transition-all"
-                    >
-                      Volver a la Lista
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Nombre del Servicio / App</label>
-                      <input 
-                        type="text" 
-                        value={editingService.name}
-                        onChange={e => setEditingService({...editingService, name: e.target.value})}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary"
-                        placeholder="Ej. Portal de Recetas Digitales"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Icono Lucide</label>
-                      <select 
-                        value={editingService.icon}
-                        onChange={e => setEditingService({...editingService, icon: e.target.value})}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary bg-white font-medium"
-                      >
-                        {ICON_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">URL de Destino (Enlace Externo)</label>
-                      <input 
-                        type="url" 
-                        value={editingService.url}
-                        onChange={e => setEditingService({...editingService, url: e.target.value})}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary"
-                        placeholder="https://su-subdominio.hospitalparoisien.gob.ar"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Categoría</label>
-                      <select 
-                        value={editingService.category || "asistencial"}
-                        onChange={e => setEditingService({...editingService, category: e.target.value})}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary bg-white font-medium"
-                      >
-                        <option value="asistencial">Asistencial</option>
-                        <option value="administrativo">Administrativo</option>
-                        <option value="general">General</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-500">Descripción Detallada</label>
-                      <textarea 
-                        value={editingService.description}
-                        onChange={e => setEditingService({...editingService, description: e.target.value})}
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-hospital-primary/20 focus:border-hospital-primary h-24 text-sm resize-none"
-                        placeholder="Breve descripción del propósito y uso del servicio..."
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
-                    <button 
-                      onClick={() => setEditingService(null)}
-                      className="px-5 py-3 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors"
-                    >
-                      Cancelar
-                    </button>
-                    <button 
-                      onClick={handleSaveService}
-                      className="px-8 py-3 bg-hospital-primary hover:bg-hospital-dark text-white rounded-xl font-bold text-sm transition-all shadow-md shadow-hospital-primary/10"
-                    >
-                      Guardar Servicio
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
+          {/* CALIDAD TAB */}
+          {activeTab === "calidad" && renderLinkManager("calidad")}
 
           {/* FAQs TAB */}
           {activeTab === "faq" && (
@@ -1044,7 +1134,7 @@ export default function AdminPage({
                 <div className="space-y-1">
                   <h3 className="font-extrabold text-slate-900 text-lg">¿Confirmar Eliminación?</h3>
                   <p className="text-slate-500 text-sm leading-relaxed">
-                    Está a punto de eliminar {deleteConfirm.type === 'procedure' ? 'el trámite' : deleteConfirm.type === 'service' ? 'el servicio' : 'la pregunta FAQ'}:
+                    Está a punto de eliminar {deleteConfirm.type === 'procedure' ? 'el trámite' : deleteConfirm.type === 'faq' ? 'la pregunta FAQ' : deleteConfirm.entityLabel}:
                   </p>
                   <p className="font-bold text-slate-800 text-sm mt-1 bg-slate-50 p-3 rounded-xl border border-slate-100 italic">
                     "{deleteConfirm.title}"
